@@ -1,10 +1,12 @@
-﻿Shader "Skybox/RGBM Cubed Skybox"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Skybox/RGBM Cubed Skybox"
 {
     Properties
     {
-        _Cubemap("Cubemap", Cube) = "white" {}
-        _Exposure("Exposure", Float) = 1
-        _YawAngle("Yaw Angle", Float) = 0
+        _Cubemap ("Cubemap", Cube) = "white" { }
+        _Exposure ("Exposure", Float) = 1
+        _YawAngle ("Yaw Angle", Float) = 0
     }
 
     CGINCLUDE
@@ -35,10 +37,10 @@
         float sn = sin(radian);
         float cs = cos(radian);
         return float4x4(
-             cs, 0, sn, 0,
-              0, 1,  0, 0,
-            -sn, 0, cs, 0,
-              0, 0,  0, 1
+            cs, 0, sn, 0,
+            0, 1, 0, 0,
+            - sn, 0, cs, 0,
+            0, 0, 0, 1
         );
     }
 
@@ -50,7 +52,7 @@
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         
         float4 p = mul(MakeRotationMatrix(), v.position);
-        o.position = mul(UNITY_MATRIX_MVP, p);
+        o.position = UnityObjectToClipPos(p);
         o.texcoord = v.texcoord;
         return o;
     }
@@ -58,14 +60,14 @@
     half4 frag(v2f i) : COLOR
     {
         float4 c = texCUBE(_Cubemap, i.texcoord);
-#if USE_LINEAR
-        half e = c.a * _Exposure * 8.0f;
-        half e2 = e * e;
-        half lin_e = dot(half2(0.7532f, 0.2468f), half2(e2, e2 * e));
-        c.rgb = c.rgb * lin_e;
-#else
-        c.rgb = c.rgb * c.a * _Exposure * 8.0f;
-#endif
+        #if USE_LINEAR
+            half e = c.a * _Exposure * 8.0f;
+            half e2 = e * e;
+            half lin_e = dot(half2(0.7532f, 0.2468f), half2(e2, e2 * e));
+            c.rgb = c.rgb * lin_e;
+        #else
+            c.rgb = c.rgb * c.a * _Exposure * 8.0f;
+        #endif
         c.a = 1.0f;
         return c;
     }
@@ -74,10 +76,13 @@
 
     SubShader
     {
-        Tags { "Queue"="Background" "RenderType"="Background" }
+        Tags { "Queue" = "Background" "RenderType" = "Background" }
         Cull Off
         ZWrite Off
-        Fog { Mode Off }
+        Fog
+        {
+            Mode Off
+        }
         Pass
         {
             CGPROGRAM
@@ -87,6 +92,6 @@
             #pragma multi_compile USE_GAMMA USE_LINEAR
             ENDCG
         }
-    } 
+    }
     CustomEditor "RgbmCubedSkyboxInspector"
 }

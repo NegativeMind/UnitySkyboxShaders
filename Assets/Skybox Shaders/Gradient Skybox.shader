@@ -1,4 +1,5 @@
-﻿Shader "Skybox/Gradient Skybox"
+﻿
+Shader "Skybox/Gradient Skybox"
 {
     Properties
     {
@@ -36,34 +37,37 @@
     half _Intensity;
     half _Exponent;
     
-    v2f vert (appdata v)
+    v2f vert(appdata v)
     {
         v2f o;
         UNITY_SETUP_INSTANCE_ID(v);
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         
-        o.position = mul (UNITY_MATRIX_MVP, v.position);
+        o.position = UnityObjectToClipPos(v.position);
         o.texcoord = v.texcoord;
         return o;
     }
     
-    fixed4 frag (v2f i) : COLOR
+    fixed4 frag(v2f i) : COLOR
     {
-        half d = dot (normalize (i.texcoord), _UpVector) * 0.5f + 0.5f;
-        return lerp (_Color1, _Color2, pow (d, _Exponent)) * _Intensity;
+        half d = dot(normalize(i.texcoord), _UpVector) * 0.5f + 0.5f;
+        return lerp(_Color1, _Color2, pow(d, _Exponent)) * _Intensity;
     }
 
     ENDCG
 
     SubShader
     {
-        Tags { "RenderType"="Background" "Queue"="Background" }
+        Tags { "RenderType" = "Background" "Queue" = "Background" }
         Pass
         {
             ZWrite Off
             Cull Off
-            Fog { Mode Off }
+            Fog
+            {
+                Mode Off
+            }
             CGPROGRAM
             #pragma fragmentoption ARB_precision_hint_fastest
             #pragma vertex vert

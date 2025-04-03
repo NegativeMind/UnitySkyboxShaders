@@ -1,27 +1,29 @@
-﻿Shader "Skybox/Horizon With Sun Skybox"
+﻿
+
+Shader "Skybox/Horizon With Sun Skybox"
 {
     Properties
     {
-        _SkyColor1("Top Color", Color) = (0.37, 0.52, 0.73, 0)
-        _SkyExponent1("Top Exponent", Float) = 8.5
+        _SkyColor1 ("Top Color", Color) = (0.37, 0.52, 0.73, 0)
+        _SkyExponent1 ("Top Exponent", Float) = 8.5
 
-        _SkyColor2("Horizon Color", Color) = (0.89, 0.96, 1, 0)
+        _SkyColor2 ("Horizon Color", Color) = (0.89, 0.96, 1, 0)
 
-        _SkyColor3("Bottom Color", Color) = (0.89, 0.89, 0.89, 0)
-        _SkyExponent2("Bottom Exponent", Float) = 3.0
+        _SkyColor3 ("Bottom Color", Color) = (0.89, 0.89, 0.89, 0)
+        _SkyExponent2 ("Bottom Exponent", Float) = 3.0
 
-        _SkyIntensity("Sky Intensity", Float) = 1.0
+        _SkyIntensity ("Sky Intensity", Float) = 1.0
 
-        _SunColor("Sun Color", Color) = (1, 0.99, 0.87, 1)
-        _SunIntensity("Sun Intensity", float) = 2.0
+        _SunColor ("Sun Color", Color) = (1, 0.99, 0.87, 1)
+        _SunIntensity ("Sun Intensity", float) = 2.0
 
-        _SunAlpha("Sun Alpha", float) = 550
-        _SunBeta("Sun Beta", float) = 1
+        _SunAlpha ("Sun Alpha", float) = 550
+        _SunBeta ("Sun Beta", float) = 1
 
-        _SunVector("Sun Vector", Vector) = (0.269, 0.615, 0.740, 0)
+        _SunVector ("Sun Vector", Vector) = (0.269, 0.615, 0.740, 0)
 
-        _SunAzimuth("Sun Azimuth (editor only)", float) = 20
-        _SunAltitude("Sun Altitude (editor only)", float) = 38
+        _SunAzimuth ("Sun Azimuth (editor only)", float) = 20
+        _SunAltitude ("Sun Altitude (editor only)", float) = 38
     }
 
     CGINCLUDE
@@ -67,7 +69,7 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
         
-        o.position = mul(UNITY_MATRIX_MVP, v.position);
+        o.position = UnityObjectToClipPos(v.position);
         o.texcoord = v.texcoord;
         return o;
     }
@@ -91,18 +93,21 @@
 
     SubShader
     {
-        Tags { "RenderType"="Background" "Queue"="Background" }
+        Tags { "RenderType" = "Background" "Queue" = "Background" }
         Pass
         {
             ZWrite Off
             Cull Off
-            Fog { Mode Off }
+            Fog
+            {
+                Mode Off
+            }
             CGPROGRAM
             #pragma fragmentoption ARB_precision_hint_fastest
             #pragma vertex vert
             #pragma fragment frag
             ENDCG
         }
-    } 
+    }
     CustomEditor "HorizonWithSunSkyboxInspector"
 }
